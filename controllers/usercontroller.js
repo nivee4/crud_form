@@ -24,9 +24,9 @@ const display_user=(req,res)=>{
 // insert users
 
 const insert_details = (req, res) => {
-    const { fname, lname, gender, address, city, state, pin } = req.body;
-    const insert = "INSERT INTO user (fname, lname, gender, address, city, state, pin) VALUES (?, ?, ?, ?, ?, ?, ?)";
-    db.query(insert, [fname, lname, gender, address, city, state, pin], err=> {
+    const { fname, lname, gender, address, city, state, pin ,dept_name} = req.body;
+    const insert = "INSERT INTO user (fname, lname, gender, address, city, state, pin,dept_name) VALUES (?, ?, ?, ?, ?, ?, ?,?)";
+    db.query(insert, [fname, lname, gender, address, city, state, pin,dept_name], err=> {
         if (err) {
             console.log(err.message);
             return res.status(500).json({ error: err.message });
@@ -93,4 +93,4 @@ const del_user=(req,res)=>{
 
 
 
-export default {form,display_user,insert_details,par_user,update_user,del_user}
+export default {display_user,insert_details,par_user,update_user,del_user}
