@@ -1,14 +1,14 @@
 import express from 'express';
 import usercontroller from '../controllers/usercontroller.js'
-const {par_user,insert_details,display_user,update_user,del_user}=usercontroller;
+const users=usercontroller;
 const router = express.Router();
 
 //router.get('/',form);
-router.post('/',insert_details);
-router.get('/',display_user);
-router.get('/:id',par_user);
-router.put('/:id',update_user);
-router.delete('/:id',del_user);
+router.post('/',users.insert_details);
+router.get('/',users.display_user);
+router.get('/:id',users.par_user);
+router.put('/:id',users.update_user);
+router.delete('/:id',users.del_user);
 
 
 

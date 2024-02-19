@@ -1,17 +1,15 @@
 
 import db from '../models/db.js';
 import dbquery from "../queries/dbquery.js";
-const {selectquery,insertquery,selectById,updatequery,deletequery}=dbquery
+const dbqueries=dbquery
 // form 
-
-const form=(req,res)=>{
-    res.render("form")
-}
+const users={
 
 // display users
 
-const display_user = (req, res) => {
-    selectquery('user', (err, result) => {
+display_user: (req, res) => {
+    // const result = await selectquery("user");
+    dbqueries.selectquery('user', (err, result) => {
         if (err) {
             console.error('Error fetching user details:', err);
             return res.status(500).json({ error: 'Internal server error' });
@@ -23,14 +21,14 @@ const display_user = (req, res) => {
         };
         res.send(respond);
     });
-};
+},
        
 
 
 // insert users
 
-const insert_details = (req, res) => {
-    insertquery('user',req.body,(err,result)=>{
+insert_details: (req, res) => {
+    dbqueries.insertquery('user',req.body,(err,result)=>{
         if (err){
             res.status(500).send(err.message);
         }
@@ -40,14 +38,14 @@ const insert_details = (req, res) => {
         }
         res.send(response);
     }); 
-}
+},
                     
 
 
 //view user
 
-const par_user=(req,res)=>{
-    selectById('user','id',req.params.id,(err,result)=>{
+par_user:(req,res)=>{
+    dbqueries.selectById('user','id',req.params.id,(err,result)=>{
         if (err) {
             console.log(err);
             res.status(500).send(err.message);
@@ -64,12 +62,12 @@ const par_user=(req,res)=>{
         res.send(respond);
         
     })
-}
+},
 
 //update user
 
-const update_user=(req,res)=>{
-    const update=updatequery('user',req.body,'id',req.params.id,(err,result)=>{
+update_user:(req,res)=>{
+    dbqueries.updatequery('user',req.body,'id',req.params.id,(err,result)=>{
         if (err) {
             res.status(500).send(err.message);
     }
@@ -80,13 +78,13 @@ const update_user=(req,res)=>{
     }
     res.send(response);
     })  
-    }
+    },
 
 
 //delete user
 
-const del_user=(req,res)=>{
-    deletequery('user','id',req.params.id,(err,result)=>{
+del_user:(req,res)=>{
+    dbqueries.deletequery('user','id',req.params.id,(err,result)=>{
         if (err) {
             console.log(err);
             res.status(500).send(err.message);
@@ -104,7 +102,7 @@ const del_user=(req,res)=>{
 }
 
 
+}
 
 
-
-export default {display_user,insert_details,par_user,update_user,del_user}
+export default users

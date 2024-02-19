@@ -1,8 +1,8 @@
 import db from '../models/db.js';
 
-
+const dbqueries={
 //select  
-const selectquery = (table, callback) => {
+selectquery : (table, callback) => {
     const query = `SELECT * FROM ${table}`;
     db.query(query, (err, rows) => {
         if (err) {
@@ -16,11 +16,11 @@ const selectquery = (table, callback) => {
         }
         callback(null, rows);
     });
-};
+},
 
 
 //insert
-const insertquery=(table,data,callback)=>{
+insertquery:(table,data,callback)=>{
     const keys = Object.keys(data);
     const values = Object.values(data).map(val=>{
         return `'${val}'`
@@ -37,10 +37,9 @@ const insertquery=(table,data,callback)=>{
         console.log('Insert successful:', result);
         callback(null,result);
     });  
-}
-
+},
 //select by id
-const selectById = (table, col, val, callback) => {
+    selectById: (table, col, val, callback) => {
     const selectId = `SELECT * FROM ${table} WHERE ${col}=?`;
     db.query(selectId, [val], (err, result) => {
         if (err) {
@@ -48,11 +47,10 @@ const selectById = (table, col, val, callback) => {
         }
         callback(null, result);
     });
-};
-
+},
 //update
 
-const updatequery = (table, data, col, val, callback) => {
+updatequery :(table, data, col, val, callback) => {
     let setValues = Object.values(data); 
     console.log(setValues)
     const updateKeys = Object.keys(data).map(key => `${key} = ?`).join(', ');
@@ -70,11 +68,11 @@ const updatequery = (table, data, col, val, callback) => {
         }
         callback(null, result);
     });
-}
+},
 
 
 //delete
-const deletequery=(table,col,val,callback)=>{
+ deletequery:(table,col,val,callback)=>{
     const deletequery=`delete from ${table} where ${col}=?`;
     db.query(deletequery,[val],(err,result)=>{
         if(err){
@@ -85,4 +83,6 @@ const deletequery=(table,col,val,callback)=>{
 
 }
 
-export default {selectquery,insertquery,selectById,updatequery,deletequery}
+}
+
+export default dbqueries
