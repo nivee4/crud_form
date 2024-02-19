@@ -1,38 +1,88 @@
+import db from '../models/db.js';
+
 
 //select  
-const selectquery=(table)=>{
-    const select=`select * from ${table}`;
-}
+const selectquery = (table, callback) => {
+    const query = `SELECT * FROM ${table}`;
+    db.query(query, (err, rows) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            callback(err, null);
+            return;
+        }
+        if (!rows || rows.length === 0) {
+            callback(null, false); 
+            return;
+        }
+        callback(null, rows);
+    });
+};
+
 
 //insert
-const insertquery=(table,data)=>{
+const insertquery=(table,data,callback)=>{
     const keys = Object.keys(data);
-    const placeholders = keys.map(() => '?').join(', ');
-    const columns = keys.join(', ');
-
-    const insert=`insert into ${table}(${columns}) values (${placeholders})`;
+    const values = Object.values(data).map(val=>{
+        return `'${val}'`
+    });
+    const columns = keys.join(',');
+    const query = `INSERT INTO ${table}(${columns}) VALUES (${values})`;
+    db.query(query, values, (err, result) => {
+        if (err) {
+            console.log('Error executing query:', err);
+            callback(err,null);
+            return ;
+            
+        }
+        console.log('Insert successful:', result);
+        callback(null,result);
+    });  
 }
 
 //select by id
-const selectById=(table,col,val)=>{
-    const selectId=`select * from ${table} where ${col}=?`;
-    const val=[val];
-    return {selectId,val}
-
-}
+const selectById = (table, col, val, callback) => {
+    const selectId = `SELECT * FROM ${table} WHERE ${col}=?`;
+    db.query(selectId, [val], (err, result) => {
+        if (err) {
+            return callback(err, null);
+        }
+        callback(null, result);
+    });
+};
 
 //update
 
-const updatequery=(table,col,val)=>{
-    // const selectId=`update ${table} set ${} where ${col}=?`;
-    // const val=[val];
-    // return {selectId,val}
+const updatequery = (table, data, col, val, callback) => {
+    let setValues = Object.values(data); 
+    console.log(setValues)
+    const updateKeys = Object.keys(data).map(key => `${key} = ?`).join(', ');
+    console.log(updateKeys)
+    const query = `UPDATE ${table} SET ${updateKeys} WHERE ${col} = ?`; 
+    console.log(query)
 
+    // Append the value to be updated to setValues array
+    setValues.push(val);
+    console.log(setValues)
+    //const values = [...setValues, val]; // Concatenate the value to be updated
+    db.query(query, setValues, (err, result) => {
+        if (err) {
+            return callback(err, null);
+        }
+        callback(null, result);
+    });
 }
 
-const deletequery=(table,col,val)=>{
+
+//delete
+const deletequery=(table,col,val,callback)=>{
     const deletequery=`delete from ${table} where ${col}=?`;
-    const val=[val];
-    return {deletequery,val}
+    db.query(deletequery,[val],(err,result)=>{
+        if(err){
+            return callback(err,null);
+        }
+        callback(null,result);
+    })
 
 }
+
+export default {selectquery,insertquery,selectById,updatequery,deletequery}

@@ -1,83 +1,96 @@
 
 import db from '../models/db.js'
+import dbquery from "../queries/dbquery.js";
+const {selectquery,insertquery,selectById,updatequery,deletequery}=dbquery;
 
-
-const dept=(req,res)=>{
-    const select='select * from dept';
-    db.query(select,(err,result)=>{
+const dept = (req, res) => {
+    selectquery('dept', (err, result) => {
         if (err) {
-            return res.status(500).json(err.message);
+            console.error('Error fetching user details:', err);
+            return res.status(500).json({ error: 'Internal server error' });
         }
-        res.send(result);
-    })
-}
+        const respond = {
+            message: "dept details entered successfully",
+            status: "SUCCESS",
+            data: result
+        };
+        res.send(respond);
+    });
+};
 
 const insert_dept=(req,res)=>{
-    const {dept_id,dept_name,dept_block}=req.body;
-    const insert='insert into dept(dept_id,dept_name,dept_block) values (?,?,?)';
-    db.query(insert,[dept_id,dept_name,dept_block],(err,result)=>{
-        if (err) {
-            return res.status(500).json(err.message);
+     
+    insertquery('dept',req.body,(err,result)=>{
+        if (err){
+            res.status(500).send(err.message);
         }
-        let response ={
-            message:"Dept details entered successfully",
-            status:"SUCCESS",
-            data:result
+        
+        let response = {
+            message:"Department inserted successfully",
+            status:"SUCCESS" 
         }
         res.send(response);
-    })
+        
+    });
 
 }
 
 const par_dept=(req,res)=>{
-    const dept_id=req.params.dept_id;
-    //console.log(req.query,"idd");
+   
+        selectById('dept','dept_id',req.params.dept_id,(err,result)=>{
+            if (err) {
+                console.log(err);
+                res.status(500).send(err.message);
+                //console.log(err.message);
+            };
+            
+            let respond={
+                message:` dept ${req.params.id} is displayed`,
+                status:"SUCCESS",
+                data:result[0]
+            }
+            res.send(respond);
+            
+        })
+    }
+    
 
-    const par="select * from dept where dept_id=?";
-    db.query(par,[dept_id],(err,result)=>{
-        if (err){
-            res.status(500).json(err.message);
+    
+
+const update_dept=(req,res)=>{
+    updatequery('dept',req.body,'dept_id',req.params.dept_id,(err,result)=>{  
+        if (err) {
+            res.status(500).send(err.message);
+    }
+    let response={
+        message:` user ${req.params.dept_id} is updated`,
+        status:"SUCCESS",
+    }
+    res.send(response);
+    })  
+}
+
+
+  
+    
+
+const del_dept=(req,res)=>{
+    deletequery('dept','dept_id',req.params.dept_id,(err,result)=>{
+        if (err) {
+            console.log(err);
+            res.status(500).send(err.message);
         }
         if(result.length===0){
             return res.status(404).json({message:"Not found"})
         }
-        res.json(result[0]);
+        let respond={
+            message:` dept ${req.params.dept_id} is deleted`,
+            status:"SUCCESS",
+            
+        }
+        res.send(respond);
     })
-
-}
-
-const update_dept=(req,res)=>{
-    const dept_id=req.params.dept_id;
-    const {dept_name,dept_block} =req.body;
-    const update="update dept set dept_name=? , dept_block=? where dept_id=?";
-    db.query(update,[dept_name,dept_block,dept_id],(err,result)=>{
-        if (err){
-            res.status(500).json(err.message);
-        }
-        else if(result.length===0){
-            return res.status(404).json({message:"Not found"})
-        }
-        else{
-            return res.status(200).send("Department is Successfully updated");
-        }
-    })
-}
-
-
-const del_dept=(req,res)=>{
-    const dept_id=req.params.dept_id;
     
-    db.query("delete from dept where dept_id=?",[dept_id],(err,result)=>{
-        if (err){
-            res.status(500).json(err.message);
-        }
-        else if(result.length===0){
-            return res.status(404).json({message:"Not found"})
-        }
-        else{
-            return res.status(200).send("Department is Successfully deleted ");
-        }
-    })
 
 }
 
