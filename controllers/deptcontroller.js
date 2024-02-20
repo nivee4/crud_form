@@ -1,26 +1,28 @@
 
 import db from '../models/db.js'
 import dbquery from "../queries/dbquery.js";
-const {selectquery,insertquery,selectById,updatequery,deletequery}=dbquery;
+const dbqueries=dbquery;
 
-const dept = (req, res) => {
-    selectquery('dept', (err, result) => {
-        if (err) {
-            console.error('Error fetching user details:', err);
-            return res.status(500).json({ error: 'Internal server error' });
-        }
-        const respond = {
-            message: "dept details entered successfully",
-            status: "SUCCESS",
-            data: result
-        };
-        res.send(respond);
-    });
-};
-
-const insert_dept=(req,res)=>{
+const depart={
+    dept :(req, res) => {
+        const condition=req.body.condition||'';
+        const attribute=req.body.attribute||['*'];
+        dbqueries.selectquery('dept',attribute,condition, (err, result) => {
+            if (err) {
+                console.error('Error fetching dept details:', err);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+            const respond = {
+                message: "Dept details entered successfully",
+                status: "SUCCESS",
+                data: result
+            };
+            res.send(respond);
+        });
+},
+insert_dept:(req,res)=>{
      
-    insertquery('dept',req.body,(err,result)=>{
+    dbqueries.insertquery('dept',req.body,(err,result)=>{
         if (err){
             res.status(500).send(err.message);
         }
@@ -33,11 +35,11 @@ const insert_dept=(req,res)=>{
         
     });
 
-}
+},
 
-const par_dept=(req,res)=>{
+ par_dept:(req,res)=>{
    
-        selectById('dept','dept_id',req.params.dept_id,(err,result)=>{
+    dbqueries.selectById('dept','dept_id',req.params.dept_id,(err,result)=>{
             if (err) {
                 console.log(err);
                 res.status(500).send(err.message);
@@ -52,13 +54,13 @@ const par_dept=(req,res)=>{
             res.send(respond);
             
         })
-    }
+    },
     
 
     
 
-const update_dept=(req,res)=>{
-    updatequery('dept',req.body,'dept_id',req.params.dept_id,(err,result)=>{  
+ update_dept:(req,res)=>{
+    dbqueries.updatequery('dept',req.body,'dept_id',req.params.dept_id,(err,result)=>{  
         if (err) {
             res.status(500).send(err.message);
     }
@@ -68,14 +70,13 @@ const update_dept=(req,res)=>{
     }
     res.send(response);
     })  
-}
-
+},
 
   
     
 
-const del_dept=(req,res)=>{
-    deletequery('dept','dept_id',req.params.dept_id,(err,result)=>{
+del_dept:(req,res)=>{
+    dbqueries.deletequery('dept','dept_id',req.params.dept_id,(err,result)=>{
         if (err) {
             console.log(err);
             res.status(500).send(err.message);
@@ -91,7 +92,24 @@ const del_dept=(req,res)=>{
         res.send(respond);
     })
     
-
+},
+multiDept:(req,res)=>{
+    dbqueries.insertMany('dept',req.body,(err,result)=>{
+        if (err) {
+            console.log(err);
+            res.status(500).send(err.message);
+        }
+        let respond={
+            message:` multiple dept are inserted`,
+            status:"SUCCESS"
+            
+        }
+        res.send(respond);
+    })
+}
 }
 
-export default {dept,insert_dept,par_dept,update_dept,del_dept}
+
+
+
+export default depart

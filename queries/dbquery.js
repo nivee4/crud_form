@@ -1,10 +1,29 @@
+import e from 'cors';
 import db from '../models/db.js';
 
 const dbqueries={
 //select  
-selectquery : (table, callback) => {
-    const query = `SELECT * FROM ${table}`;
-    db.query(query, (err, rows) => {
+selectquery : (table,attribute,condition , callback) => {
+    let attr='';
+    let str='';
+    let val=[];
+    if(Array.isArray(attribute) && attribute.length>0){
+        attr=attribute.join(",");
+    }
+    else{
+        attr='*';
+    }
+
+    for (let field in condition) {
+        if (condition[field]) {
+          str += `${field} = ? AND `;
+          val.push(condition[field]);
+        }
+      }
+        str=str.slice(0,-5)
+    
+    const query = `SELECT ${attr} FROM ${table} ${str?'where '+str:''}`;
+    db.query(query,val, (err, rows) => {
         if (err) {
             console.error('Error executing query:', err);
             callback(err, null);
@@ -81,8 +100,35 @@ updatequery :(table, data, col, val, callback) => {
         callback(null,result);
     })
 
+},
+insertMany: (table, dataArray, callback) => {
+    const keys = Object.keys(dataArray[0]);
+    const columns = keys.join(',');
+    console.log(columns)
+    let query = `INSERT INTO ${table} (${columns}) VALUES `;
+    console.log(query)
+    let values = [];
+    dataArray.forEach((data, index) => {
+        const rowValues = Object.values(data).map(val => {
+            return `'${val}'`;
+        });
+        query += `(${rowValues.join(',')})`;
+        if (index < dataArray.length - 1) {
+            query += ', ';
+        }
+        values = values.concat(rowValues);
+    });
+
+    db.query(query, values, (err, result) => {
+        if (err) {
+            console.log('Error executing query:', err);
+            callback(err, null);
+            return;
+        }
+        console.log('Insert successful:', result);
+        callback(null, result);
+    });
 }
 
 }
-
 export default dbqueries

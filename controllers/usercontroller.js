@@ -1,15 +1,16 @@
 
-import db from '../models/db.js';
+//import db from '../models/db.js';
 import dbquery from "../queries/dbquery.js";
 const dbqueries=dbquery
 // form 
 const users={
 
 // display users
-
 display_user: (req, res) => {
     // const result = await selectquery("user");
-    dbqueries.selectquery('user', (err, result) => {
+    const condition=req.body.condition||'';
+    const attribute=req.body.attribute||['*'];
+    dbqueries.selectquery('user',attribute,condition, (err, result) => {
         if (err) {
             console.error('Error fetching user details:', err);
             return res.status(500).json({ error: 'Internal server error' });
@@ -99,8 +100,22 @@ del_user:(req,res)=>{
         }
         res.send(respond);
     })
-}
+},
 
+multiUser:(req,res)=>{
+    dbqueries.insertMany('user',req.body,(err,result)=>{
+        if (err) {
+            console.log(err);
+            res.status(500).send(err.message);
+        }
+        let respond={
+            message:` multiple users are inserted`,
+            status:"SUCCESS"
+            
+        }
+        res.send(respond);
+    })
+}
 
 }
 
