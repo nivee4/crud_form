@@ -1,9 +1,10 @@
-import e from 'cors';
+
 import db from '../models/db.js';
 
 const dbqueries={
 //select  
-selectquery : (table,attribute,condition , callback) => {
+selectquery : (table,attribute,condition,callback) => {
+
     let attr='';
     let str='';
     let val=[];
@@ -13,24 +14,22 @@ selectquery : (table,attribute,condition , callback) => {
     else{
         attr='*';
     }
-
+    
     for (let field in condition) {
         if (condition[field]) {
           str += `${field} = ? AND `;
           val.push(condition[field]);
         }
       }
-        str=str.slice(0,-5)
-    
+
+    str=str.slice(0,-5)
+        
     const query = `SELECT ${attr} FROM ${table} ${str?'where '+str:''}`;
+    console.log(query)
     db.query(query,val, (err, rows) => {
         if (err) {
             console.error('Error executing query:', err);
             callback(err, null);
-            return;
-        }
-        if (!rows || rows.length === 0) {
-            callback(null, false); 
             return;
         }
         callback(null, rows);
@@ -44,8 +43,11 @@ insertquery:(table,data,callback)=>{
     const values = Object.values(data).map(val=>{
         return `'${val}'`
     });
+    console.log(values)
     const columns = keys.join(',');
+    console.log(columns)
     const query = `INSERT INTO ${table}(${columns}) VALUES (${values})`;
+    console.log(query)
     db.query(query, values, (err, result) => {
         if (err) {
             console.log('Error executing query:', err);
@@ -59,8 +61,9 @@ insertquery:(table,data,callback)=>{
 },
 //select by id
     selectById: (table, col, val, callback) => {
-    const selectId = `SELECT * FROM ${table} WHERE ${col}=?`;
-    db.query(selectId, [val], (err, result) => {
+    const query = `SELECT * FROM ${table} WHERE ${col}=?`;
+    console.log(query)
+    db.query(query, [val], (err, result) => {
         if (err) {
             return callback(err, null);
         }
@@ -92,8 +95,9 @@ updatequery :(table, data, col, val, callback) => {
 
 //delete
  deletequery:(table,col,val,callback)=>{
-    const deletequery=`delete from ${table} where ${col}=?`;
-    db.query(deletequery,[val],(err,result)=>{
+    const query=`delete from ${table} where ${col}=?`;
+    console.log(query)
+    db.query(query,[val],(err,result)=>{
         if(err){
             return callback(err,null);
         }
@@ -128,7 +132,43 @@ insertMany: (table, dataArray, callback) => {
         console.log('Insert successful:', result);
         callback(null, result);
     });
+},     
+
+innerJoin: (table1, table2,condition1,condition2,attribute1,attribute2, callback) => {
+    let attr1 = '';
+    let attr2 = '';
+    
+    if (Array.isArray(attribute1) && attribute1.length > 0) {
+        attr1 = attribute1.join(",");
+    } else {
+        attr1 = '*';
+    }
+
+    if (Array.isArray(attribute2) && attribute2.length > 0) {
+        attr2 = attribute2.join(",");
+    } else {
+        attr2 = '*';
+    }
+    
+    const selectClause1 = `${table1}.${attr1}`;
+    console.log(selectClause1,condition1)
+    const selectClause2 = `${table2}.${attr2}`;
+    console.log(selectClause2,condition2)
+    console.log(`${table1}.${condition2}`)
+    const query= `SELECT ${selectClause1}, ${selectClause2} FROM ${table1} JOIN ${table2} ON ${table1}.${condition1} = ${table2}.${condition2}`;
+
+    console.log(query); // Log the constructed SQL query
+
+    db.query(query, (err, result) => {
+        if (err) {
+            return callback(err, null);
+        }
+        //console.log('Insert successful:', result);
+        callback(null, result);
+    });
 }
 
 }
+
+
 export default dbqueries

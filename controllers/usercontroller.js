@@ -8,11 +8,12 @@ const users={
 // display users
 display_user: (req, res) => {
     // const result = await selectquery("user");
-    const condition=req.body.condition||'';
-    const attribute=req.body.attribute||['*'];
-    dbqueries.selectquery('user',attribute,condition, (err, result) => {
+    const condition = req.query || '';
+        const {fname,lname} = req.body;
+
+dbqueries.selectquery('user',['fname','lname'],condition, (err, result) => {
         if (err) {
-            console.error('Error fetching user details:', err);
+            console.error('Error displaying user details:', err);
             return res.status(500).json({ error: 'Internal server error' });
         }
         const respond = {
@@ -31,6 +32,7 @@ display_user: (req, res) => {
 insert_details: (req, res) => {
     dbqueries.insertquery('user',req.body,(err,result)=>{
         if (err){
+            console.error('Error inserting user details:', err);
             res.status(500).send(err.message);
         }
         let response = {
@@ -48,9 +50,9 @@ insert_details: (req, res) => {
 par_user:(req,res)=>{
     dbqueries.selectById('user','id',req.params.id,(err,result)=>{
         if (err) {
-            console.log(err);
+            console.error('Error displaying particular user :', err);
             res.status(500).send(err.message);
-            //console.log(err.message);
+            
         };
         if(result.length===0){
             return res.status(404).json({message:"Not found"})
@@ -70,6 +72,7 @@ par_user:(req,res)=>{
 update_user:(req,res)=>{
     dbqueries.updatequery('user',req.body,'id',req.params.id,(err,result)=>{
         if (err) {
+            console.error('Error updating user details:', err);
             res.status(500).send(err.message);
     }
     let response={
@@ -88,13 +91,14 @@ del_user:(req,res)=>{
     dbqueries.deletequery('user','id',req.params.id,(err,result)=>{
         if (err) {
             console.log(err);
+            console.error('Error deleting user details:', err);
             res.status(500).send(err.message);
         }
         if(result.length===0){
             return res.status(404).json({message:"Not found"})
         }
         let respond={
-            message:` user ${req.params.dept_id} is deleted`,
+            message:` user ${req.params.id} is deleted`,
             status:"SUCCESS",
             
         }
@@ -105,7 +109,7 @@ del_user:(req,res)=>{
 multiUser:(req,res)=>{
     dbqueries.insertMany('user',req.body,(err,result)=>{
         if (err) {
-            console.log(err);
+            console.error('Error fetching multiple user details:', err);
             res.status(500).send(err.message);
         }
         let respond={
@@ -116,6 +120,8 @@ multiUser:(req,res)=>{
         res.send(respond);
     })
 }
+
+
 
 }
 

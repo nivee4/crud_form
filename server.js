@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import router from './routes/userroutes.js';
 import router1 from './routes/deptroutes.js';
+import routes from './routes/route.js';
 //import path from "path";
 
 const app = express();
@@ -15,8 +16,8 @@ app.use(express.urlencoded({ extended: false }));
 
 // Mount the router middleware
 app.use('/users', router);
-app.use('/dept',router1)
-
+app.use('/dept',router1);
+app.use('/',routes);
 const port = 8080;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

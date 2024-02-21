@@ -4,26 +4,28 @@ import dbquery from "../queries/dbquery.js";
 const dbqueries=dbquery;
 
 const depart={
-    dept :(req, res) => {
-        const condition=req.body.condition||'';
-        const attribute=req.body.attribute||['*'];
-        dbqueries.selectquery('dept',attribute,condition, (err, result) => {
-            if (err) {
-                console.error('Error fetching dept details:', err);
-                return res.status(500).json({ error: 'Internal server error' });
-            }
-            const respond = {
-                message: "Dept details entered successfully",
-                status: "SUCCESS",
-                data: result
-            };
-            res.send(respond);
-        });
+    dept:(req,res)=>{
+        const condition = req.query || '';
+        const {dept_id,dept_name} = req.body.attribute || ['*'];
+
+    dbqueries.selectquery('dept',['dept_id','dept_name'],condition, (err, result) => {
+        if (err) {
+            console.error('Error displaying dept details:', err);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+        const respond = {
+            message: "Dept details entered successfully",
+            status: "SUCCESS",
+            data: result
+        };
+        res.send(respond);
+    });
 },
 insert_dept:(req,res)=>{
      
     dbqueries.insertquery('dept',req.body,(err,result)=>{
         if (err){
+            console.error('Error fetching dept details:', err);
             res.status(500).send(err.message);
         }
         
@@ -41,7 +43,7 @@ insert_dept:(req,res)=>{
    
     dbqueries.selectById('dept','dept_id',req.params.dept_id,(err,result)=>{
             if (err) {
-                console.log(err);
+                console.error('Error displaying paticular dept:', err);
                 res.status(500).send(err.message);
                 //console.log(err.message);
             };
@@ -62,6 +64,7 @@ insert_dept:(req,res)=>{
  update_dept:(req,res)=>{
     dbqueries.updatequery('dept',req.body,'dept_id',req.params.dept_id,(err,result)=>{  
         if (err) {
+            console.error('Error updating dept details:', err);
             res.status(500).send(err.message);
     }
     let response={
@@ -78,7 +81,7 @@ insert_dept:(req,res)=>{
 del_dept:(req,res)=>{
     dbqueries.deletequery('dept','dept_id',req.params.dept_id,(err,result)=>{
         if (err) {
-            console.log(err);
+            console.error('Error deleting dept details:', err);
             res.status(500).send(err.message);
         }
         if(result.length===0){
@@ -96,7 +99,7 @@ del_dept:(req,res)=>{
 multiDept:(req,res)=>{
     dbqueries.insertMany('dept',req.body,(err,result)=>{
         if (err) {
-            console.log(err);
+            console.error('Error fetching multiple dept :', err);
             res.status(500).send(err.message);
         }
         let respond={
@@ -106,7 +109,9 @@ multiDept:(req,res)=>{
         }
         res.send(respond);
     })
-}
+},
+
+
 }
 
 
